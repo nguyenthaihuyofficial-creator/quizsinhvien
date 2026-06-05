@@ -2,31 +2,103 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuizSinhVien</title>
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
-  height:100vh;
+  min-height:100vh;
   display:flex;
-  justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#1e3c72,#2a5298);
-  color:white;
+  justify-content:center;
   font-family:Arial,sans-serif;
-  text-align:center;
+  color:white;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.65)),
+    url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80");
+  background-size:cover;
+  background-position:center;
 }
-.box{
-  background:rgba(0,0,0,0.4);
-  padding:30px;
-  border-radius:15px;
+.card{
+  width:90%;
+  max-width:460px;
+  padding:35px 28px;
+  text-align:center;
+  border-radius:25px;
+  background:rgba(255,255,255,.13);
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.25);
+}
+.avatar{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  margin:0 auto 18px;
+  background:linear-gradient(135deg,#00e5ff,#7c4dff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:bold;
+}
+h1{
+  margin:10px 0;
+  font-size:30px;
+}
+.status{
+  color:#ffd166;
+  font-weight:bold;
+  margin-bottom:22px;
+}
+p{
+  line-height:1.6;
+}
+.buttons{
+  display:grid;
+  gap:12px;
+  margin-top:25px;
+}
+.btn{
+  display:block;
+  padding:14px 18px;
+  border-radius:14px;
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.25);
+  transition:.25s;
+}
+.btn:hover{
+  transform:translateY(-3px);
+  background:rgba(255,255,255,.28);
+}
+.footer{
+  margin-top:25px;
+  font-size:13px;
+  opacity:.8;
 }
 </style>
 </head>
 <body>
-<div class="box">
-  <h1>🚧 Website đang được phát triển</h1>
-  <p>SĐT: 09xxxxxxxx</p>
-  <p>Email: thaihuyit@hotmail.com</p>
-</div>
+  <div class="card">
+    <div class="avatar">Q</div>
+
+    <h1>QuizSinhVien</h1>
+    <div class="status">🚧 Website đang được phát triển</div>
+
+    <p>Xin chào! Website hiện đang trong quá trình xây dựng. Bạn có thể liên hệ với mình qua các nút bên dưới.</p>
+
+    <div class="buttons">
+      <a class="btn" href="tel:0389696976">📞 Gọi điện</a>
+      <a class="btn" href="mailto:thaihuyit@hotmail.com">✉️ Gửi Email</a>
+      <a class="btn" href="https://zalo.me/0389696976" target="_blank">💬 Zalo</a>
+      <a class="btn" href="https://facebook.com/thaihuy.it" target="_blank">📘 Facebook</a>
+    </div>
+
+    <div class="footer">© 2026 QuizSinhVien.vn</div>
+  </div>
 </body>
 </html>
