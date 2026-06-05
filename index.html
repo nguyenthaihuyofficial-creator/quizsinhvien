@@ -3,102 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuizSinhVien</title>
+<title>QuizSinhVien.vn</title>
 <style>
-*{box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box}
+
 body{
-  margin:0;
   min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   font-family:Arial,sans-serif;
   color:white;
   background:
-    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.65)),
+    linear-gradient(rgba(5,10,25,.75),rgba(5,10,25,.8)),
     url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80");
   background-size:cover;
   background-position:center;
-}
-.card{
-  width:90%;
-  max-width:460px;
-  padding:35px 28px;
-  text-align:center;
-  border-radius:25px;
-  background:rgba(255,255,255,.13);
-  backdrop-filter:blur(14px);
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
-  border:1px solid rgba(255,255,255,.25);
-}
-.avatar{
-  width:105px;
-  height:105px;
-  border-radius:50%;
-  margin:0 auto 18px;
-  background:linear-gradient(135deg,#00e5ff,#7c4dff);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:42px;
+  padding:20px;
+}
+
+.card{
+  max-width:520px;
+  width:100%;
+  text-align:center;
+  padding:38px 30px;
+  border-radius:28px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
+}
+
+.logo{
+  width:105px;
+  height:105px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#00d4ff,#7c4dff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:46px;
   font-weight:bold;
+  box-shadow:0 0 35px rgba(0,212,255,.45);
 }
+
 h1{
-  margin:10px 0;
-  font-size:30px;
+  font-size:34px;
+  margin-bottom:8px;
 }
-.status{
+
+.badge{
+  display:inline-block;
+  margin:12px 0 22px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:rgba(255,209,102,.18);
   color:#ffd166;
   font-weight:bold;
-  margin-bottom:22px;
+  border:1px solid rgba(255,209,102,.35);
 }
-p{
-  line-height:1.6;
+
+.desc{
+  font-size:16px;
+  line-height:1.7;
+  color:#e5e7eb;
+  margin-bottom:26px;
 }
+
 .buttons{
   display:grid;
-  gap:12px;
-  margin-top:25px;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
 }
+
 .btn{
-  display:block;
-  padding:14px 18px;
-  border-radius:14px;
-  color:white;
   text-decoration:none;
+  color:white;
+  padding:15px;
+  border-radius:16px;
   font-weight:bold;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.22);
   transition:.25s;
 }
+
 .btn:hover{
-  transform:translateY(-3px);
-  background:rgba(255,255,255,.28);
+  transform:translateY(-4px);
+  background:rgba(255,255,255,.25);
+  box-shadow:0 12px 30px rgba(0,0,0,.28);
 }
+
+.full{
+  grid-column:1/3;
+}
+
 .footer{
   margin-top:25px;
   font-size:13px;
-  opacity:.8;
+  color:#cbd5e1;
+}
+
+@media(max-width:480px){
+  h1{font-size:28px}
+  .buttons{grid-template-columns:1fr}
+  .full{grid-column:auto}
 }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="avatar">Q</div>
 
-    <h1>QuizSinhVien</h1>
-    <div class="status">🚧 Website đang được phát triển</div>
+<div class="card">
+  <div class="logo">Q</div>
 
-    <p>Xin chào! Website hiện đang trong quá trình xây dựng. Bạn có thể liên hệ với mình qua các nút bên dưới.</p>
+  <h1>QuizSinhVien.vn</h1>
 
-    <div class="buttons">
-      <a class="btn" href="tel:0389696976">📞 Gọi điện</a>
-      <a class="btn" href="mailto:thaihuyit@hotmail.com">✉️ Gửi Email</a>
-      <a class="btn" href="https://zalo.me/0389696976" target="_blank">💬 Zalo</a>
-      <a class="btn" href="https://facebook.com/thaihuy.it" target="_blank">📘 Facebook</a>
-    </div>
+  <div class="badge">🚧 Website đang được phát triển</div>
 
-    <div class="footer">© 2026 QuizSinhVien.vn</div>
+  <p class="desc">
+    Xin chào! Website QuizSinhVien.vn hiện đang trong quá trình xây dựng.
+    Bạn có thể liên hệ với mình qua các thông tin bên dưới.
+  </p>
+
+  <div class="buttons">
+    <a class="btn" href="tel:09xxxxxxxx">📞 Gọi điện</a>
+    <a class="btn" href="mailto:thaihuyit@hotmail.com">✉️ Email</a>
+    <a class="btn" href="https://zalo.me/0389696976" target="_blank">💬 Zalo</a>
+    <a class="btn" href="https://facebook.com/thaihuy.it" target="_blank">📘 Facebook</a>
+    <a class="btn full" href="https://nguyenthaihuyofficial-creator.github.io/quizsinhvien/" target="_blank">🌐 GitHub Pages</a>
   </div>
+
+  <div class="footer">© 2026 QuizSinhVien.vn • All rights reserved</div>
+</div>
+
 </body>
 </html>
