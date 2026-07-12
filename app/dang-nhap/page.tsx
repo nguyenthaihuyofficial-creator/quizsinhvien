@@ -163,7 +163,6 @@ export default function DangNhapPage() {
         return;
       }
 
-      setMode("login");
       setPassword("");
       setConfirmPassword("");
 

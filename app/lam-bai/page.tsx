@@ -72,6 +72,8 @@ interface CalculatedResult {
   totalQuestions: number;
 }
 
+const TOTAL_EXAM_SCORE = 10;
+
 export default function LamBaiPage() {
   const [exam, setExam] = useState<Exam | null>(null);
   const [userId, setUserId] = useState("");
@@ -285,7 +287,6 @@ export default function LamBaiPage() {
   const result = useMemo<CalculatedResult | null>(() => {
     if (!exam || !submitted) return null;
 
-    let score = 0;
     let correctCount = 0;
 
     exam.questions.forEach((question) => {
@@ -297,22 +298,21 @@ export default function LamBaiPage() {
       );
 
       if (selectedAnswer?.isCorrect) {
-        score += Number(question.score) || 0;
         correctCount++;
       }
     });
 
-    const maxScore = exam.questions.reduce(
-      (total, question) =>
-        total + (Number(question.score) || 0),
-      0
-    );
+    const totalQuestions = exam.questions.length;
+    const score =
+      totalQuestions > 0
+        ? (correctCount / totalQuestions) * TOTAL_EXAM_SCORE
+        : 0;
 
     return {
       score: Number(score.toFixed(2)),
-      maxScore: Number(maxScore.toFixed(2)),
+      maxScore: TOTAL_EXAM_SCORE,
       correctCount,
-      totalQuestions: exam.questions.length,
+      totalQuestions,
     };
   }, [exam, selectedAnswers, submitted]);
 
@@ -511,14 +511,13 @@ export default function LamBaiPage() {
         ...selectedAnswersRef.current,
       };
 
-      let score = 0;
       let correctCount = 0;
 
-      const maxScore = exam.questions.reduce(
-        (total, question) =>
-          total + (Number(question.score) || 0),
-        0
-      );
+      const totalQuestions = exam.questions.length;
+      const scorePerQuestion =
+        totalQuestions > 0
+          ? TOTAL_EXAM_SCORE / totalQuestions
+          : 0;
 
       const answerDetails = exam.questions.map(
         (question) => {
@@ -536,11 +535,10 @@ export default function LamBaiPage() {
           );
 
           const scoreAwarded = isCorrect
-            ? Number(question.score) || 0
+            ? scorePerQuestion
             : 0;
 
           if (isCorrect) {
-            score += scoreAwarded;
             correctCount++;
           }
 
@@ -552,6 +550,11 @@ export default function LamBaiPage() {
           };
         }
       );
+
+      const finalScore =
+        totalQuestions > 0
+          ? (correctCount / totalQuestions) * TOTAL_EXAM_SCORE
+          : 0;
 
       const totalSeconds =
         exam.durationMinutes * 60;
@@ -582,10 +585,10 @@ export default function LamBaiPage() {
           exam_id: exam.id,
           user_id: userId,
           student_name: studentName.trim(),
-          score: Number(score.toFixed(2)),
-          max_score: Number(maxScore.toFixed(2)),
+          score: Number(finalScore.toFixed(2)),
+          max_score: TOTAL_EXAM_SCORE,
           correct_count: correctCount,
-          total_questions: exam.questions.length,
+          total_questions: totalQuestions,
           used_seconds: usedSeconds,
           violation_count: violationCountRef.current,
           violation_log: violationLogRef.current,
@@ -859,7 +862,7 @@ export default function LamBaiPage() {
                       </div>
 
                       <span className="self-start rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">
-                        {question.score} điểm
+                        {(TOTAL_EXAM_SCORE / exam.questions.length).toFixed(2)} điểm
                       </span>
                     </div>
 
