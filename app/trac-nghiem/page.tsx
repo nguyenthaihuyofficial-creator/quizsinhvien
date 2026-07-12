@@ -51,6 +51,13 @@ interface DatabaseExam {
   title: string;
   duration_minutes: number;
   status: ExamStatus;
+  question_limit: number | null;
+  shuffle_questions: boolean;
+  shuffle_answers: boolean;
+  require_fullscreen: boolean;
+  max_violations: number;
+  auto_submit_on_violation: boolean;
+  block_copy_paste: boolean;
   questions: DatabaseQuestion[];
 }
 
@@ -137,6 +144,13 @@ export default function TracNghiemPage() {
     useState(15);
   const [examStatus, setExamStatus] =
     useState<ExamStatus>("draft");
+  const [questionLimit, setQuestionLimit] = useState(0);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [shuffleAnswers, setShuffleAnswers] = useState(false);
+  const [requireFullscreen, setRequireFullscreen] = useState(false);
+  const [maxViolations, setMaxViolations] = useState(3);
+  const [autoSubmitOnViolation, setAutoSubmitOnViolation] = useState(true);
+  const [blockCopyPaste, setBlockCopyPaste] = useState(true);
   const [questions, setQuestions] = useState<Question[]>(
     []
   );
@@ -231,6 +245,13 @@ export default function TracNghiemPage() {
         title,
         duration_minutes,
         status,
+        question_limit,
+        shuffle_questions,
+        shuffle_answers,
+        require_fullscreen,
+        max_violations,
+        auto_submit_on_violation,
+        block_copy_paste,
         questions (
           id,
           content,
@@ -274,6 +295,13 @@ export default function TracNghiemPage() {
     setExamTitle(exam.title);
     setDurationMinutes(exam.duration_minutes);
     setExamStatus(exam.status);
+    setQuestionLimit(exam.question_limit || 0);
+    setShuffleQuestions(Boolean(exam.shuffle_questions));
+    setShuffleAnswers(Boolean(exam.shuffle_answers));
+    setRequireFullscreen(Boolean(exam.require_fullscreen));
+    setMaxViolations(Number(exam.max_violations) || 3);
+    setAutoSubmitOnViolation(Boolean(exam.auto_submit_on_violation));
+    setBlockCopyPaste(Boolean(exam.block_copy_paste));
     setQuestions(restoredQuestions);
     setMessage("Đã tải đề thi để chỉnh sửa.");
     setMessageType("info");
@@ -843,6 +871,16 @@ export default function TracNghiemPage() {
             title: cleanTitle,
             duration_minutes: durationMinutes,
             status: examStatus,
+            question_limit:
+              questionLimit > 0
+                ? Math.min(questionLimit, cleanedQuestions.length)
+                : null,
+            shuffle_questions: shuffleQuestions,
+            shuffle_answers: shuffleAnswers,
+            require_fullscreen: requireFullscreen,
+            max_violations: maxViolations,
+            auto_submit_on_violation: autoSubmitOnViolation,
+            block_copy_paste: blockCopyPaste,
           })
           .eq("id", examId);
 
@@ -868,6 +906,16 @@ export default function TracNghiemPage() {
               title: cleanTitle,
               duration_minutes: durationMinutes,
               status: examStatus,
+              question_limit:
+                questionLimit > 0
+                  ? Math.min(questionLimit, cleanedQuestions.length)
+                  : null,
+              shuffle_questions: shuffleQuestions,
+              shuffle_answers: shuffleAnswers,
+              require_fullscreen: requireFullscreen,
+              max_violations: maxViolations,
+              auto_submit_on_violation: autoSubmitOnViolation,
+              block_copy_paste: blockCopyPaste,
             })
             .select("id")
             .single();
@@ -975,6 +1023,13 @@ export default function TracNghiemPage() {
     setExamTitle("Đề trắc nghiệm mới");
     setDurationMinutes(15);
     setExamStatus("draft");
+    setQuestionLimit(0);
+    setShuffleQuestions(false);
+    setShuffleAnswers(false);
+    setRequireFullscreen(false);
+    setMaxViolations(3);
+    setAutoSubmitOnViolation(true);
+    setBlockCopyPaste(true);
     setQuestions([]);
     setFile(null);
     setMessage("Đã làm mới trang tạo đề.");
@@ -1147,6 +1202,83 @@ export default function TracNghiemPage() {
               </select>
             </div>
           </div>
+
+          <section className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <h2 className="text-lg font-extrabold text-slate-900">
+              Cấu hình đề và chống gian lận
+            </h2>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">
+                  Số câu lấy ngẫu nhiên
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={Math.max(questions.length, 1)}
+                  value={questionLimit}
+                  onChange={(event) =>
+                    setQuestionLimit(
+                      Math.max(0, Number(event.target.value) || 0)
+                    )
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Nhập 0 để dùng toàn bộ câu hỏi.
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">
+                  Số lần rời trang tối đa
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={maxViolations}
+                  onChange={(event) =>
+                    setMaxViolations(
+                      Math.min(20, Math.max(1, Number(event.target.value) || 3))
+                    )
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3"
+                />
+              </div>
+
+              <label className="flex items-center gap-3 rounded-xl bg-white p-4">
+                <input type="checkbox" checked={shuffleQuestions}
+                  onChange={(e) => setShuffleQuestions(e.target.checked)} />
+                <span className="font-semibold">Đảo câu hỏi</span>
+              </label>
+
+              <label className="flex items-center gap-3 rounded-xl bg-white p-4">
+                <input type="checkbox" checked={shuffleAnswers}
+                  onChange={(e) => setShuffleAnswers(e.target.checked)} />
+                <span className="font-semibold">Đảo đáp án</span>
+              </label>
+
+              <label className="flex items-center gap-3 rounded-xl bg-white p-4">
+                <input type="checkbox" checked={requireFullscreen}
+                  onChange={(e) => setRequireFullscreen(e.target.checked)} />
+                <span className="font-semibold">Bắt buộc toàn màn hình</span>
+              </label>
+
+              <label className="flex items-center gap-3 rounded-xl bg-white p-4">
+                <input type="checkbox" checked={autoSubmitOnViolation}
+                  onChange={(e) => setAutoSubmitOnViolation(e.target.checked)} />
+                <span className="font-semibold">Tự nộp khi đủ vi phạm</span>
+              </label>
+
+              <label className="flex items-center gap-3 rounded-xl bg-white p-4">
+                <input type="checkbox" checked={blockCopyPaste}
+                  onChange={(e) => setBlockCopyPaste(e.target.checked)} />
+                <span className="font-semibold">Chặn sao chép, dán, chuột phải</span>
+              </label>
+            </div>
+          </section>
 
           <div className="mt-6">
             <label

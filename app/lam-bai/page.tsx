@@ -29,6 +29,13 @@ interface Exam {
   title: string;
   durationMinutes: number;
   status: "published";
+  questionLimit: number | null;
+  shuffleQuestions: boolean;
+  shuffleAnswers: boolean;
+  requireFullscreen: boolean;
+  maxViolations: number;
+  autoSubmitOnViolation: boolean;
+  blockCopyPaste: boolean;
   questions: Question[];
 }
 
@@ -37,6 +44,13 @@ interface DatabaseExam {
   title: string;
   duration_minutes: number;
   status: string;
+  question_limit: number | null;
+  shuffle_questions: boolean;
+  shuffle_answers: boolean;
+  require_fullscreen: boolean;
+  max_violations: number;
+  auto_submit_on_violation: boolean;
+  block_copy_paste: boolean;
   questions: {
     id: string;
     content: string;
@@ -71,6 +85,10 @@ export default function LamBaiPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [savingResult, setSavingResult] = useState(false);
   const [resultSaved, setResultSaved] = useState(false);
+  const [violationCount, setViolationCount] = useState(0);
+  const [violationLog, setViolationLog] = useState<
+    { type: string; at: string }[]
+  >([]);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<
     "success" | "error" | "info"
@@ -81,10 +99,19 @@ export default function LamBaiPage() {
     Record<string, string>
   >({});
   const submittingRef = useRef(false);
+  const examStartedRef = useRef(false);
+  const submittedRef = useRef(false);
+  const violationCountRef = useRef(0);
+  const violationLogRef = useRef<{ type: string; at: string }[]>([]);
 
   useEffect(() => {
     selectedAnswersRef.current = selectedAnswers;
   }, [selectedAnswers]);
+
+  useEffect(() => {
+    examStartedRef.current = examStarted;
+    submittedRef.current = submitted;
+  }, [examStarted, submitted]);
 
   useEffect(() => {
     initializePage();
@@ -135,6 +162,13 @@ export default function LamBaiPage() {
           title,
           duration_minutes,
           status,
+          question_limit,
+          shuffle_questions,
+          shuffle_answers,
+          require_fullscreen,
+          max_violations,
+          auto_submit_on_violation,
+          block_copy_paste,
           questions (
             id,
             content,
@@ -162,40 +196,65 @@ export default function LamBaiPage() {
       const databaseExam =
         data as unknown as DatabaseExam;
 
+      function shuffleArray<T>(items: T[]) {
+        const result = [...items];
+        for (let index = result.length - 1; index > 0; index--) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [result[index], result[randomIndex]] = [
+            result[randomIndex],
+            result[index],
+          ];
+        }
+        return result;
+      }
+
+      let normalizedQuestions = [
+        ...(databaseExam.questions || []),
+      ]
+        .sort((a, b) => Number(a.position) - Number(b.position))
+        .map((question) => ({
+          id: question.id,
+          content: question.content,
+          score: Number(question.score) || 0,
+          position: question.position,
+          answers: (
+            databaseExam.shuffle_answers
+              ? shuffleArray(question.answers || [])
+              : [...(question.answers || [])].sort(
+                  (a, b) => Number(a.position) - Number(b.position)
+                )
+          ).map((answer) => ({
+            id: answer.id,
+            content: answer.content,
+            isCorrect: answer.is_correct,
+            position: answer.position,
+          })),
+        }));
+
+      if (databaseExam.shuffle_questions) {
+        normalizedQuestions = shuffleArray(normalizedQuestions);
+      }
+
+      const questionLimit = Number(databaseExam.question_limit) || 0;
+      if (questionLimit > 0) {
+        normalizedQuestions = normalizedQuestions.slice(0, questionLimit);
+      }
+
       const normalizedExam: Exam = {
         id: databaseExam.id,
         title: databaseExam.title,
-        durationMinutes:
-          Number(databaseExam.duration_minutes) || 15,
+        durationMinutes: Number(databaseExam.duration_minutes) || 15,
         status: "published",
-        questions: [
-          ...(databaseExam.questions || []),
-        ]
-          .sort(
-            (a, b) =>
-              Number(a.position) -
-              Number(b.position)
-          )
-          .map((question) => ({
-            id: question.id,
-            content: question.content,
-            score: Number(question.score) || 0,
-            position: question.position,
-            answers: [
-              ...(question.answers || []),
-            ]
-              .sort(
-                (a, b) =>
-                  Number(a.position) -
-                  Number(b.position)
-              )
-              .map((answer) => ({
-                id: answer.id,
-                content: answer.content,
-                isCorrect: answer.is_correct,
-                position: answer.position,
-              })),
-          })),
+        questionLimit: databaseExam.question_limit,
+        shuffleQuestions: Boolean(databaseExam.shuffle_questions),
+        shuffleAnswers: Boolean(databaseExam.shuffle_answers),
+        requireFullscreen: Boolean(databaseExam.require_fullscreen),
+        maxViolations: Number(databaseExam.max_violations) || 3,
+        autoSubmitOnViolation: Boolean(
+          databaseExam.auto_submit_on_violation
+        ),
+        blockCopyPaste: Boolean(databaseExam.block_copy_paste),
+        questions: normalizedQuestions,
       };
 
       if (normalizedExam.questions.length === 0) {
@@ -268,7 +327,96 @@ export default function LamBaiPage() {
     )}:${String(seconds).padStart(2, "0")}`;
   }
 
-  function handleStartExam() {
+  async function registerViolation(type: string) {
+    if (!examStartedRef.current || submittedRef.current || !exam) return;
+
+    const nextLog = [
+      ...violationLogRef.current,
+      { type, at: new Date().toISOString() },
+    ];
+    const nextCount = violationCountRef.current + 1;
+
+    violationLogRef.current = nextLog;
+    violationCountRef.current = nextCount;
+    setViolationLog(nextLog);
+    setViolationCount(nextCount);
+
+    setMessage(
+      `Cảnh báo ${nextCount}/${exam.maxViolations}: ${type}.`
+    );
+    setMessageType("error");
+
+    if (
+      exam.autoSubmitOnViolation &&
+      nextCount >= exam.maxViolations
+    ) {
+      await submitExam(true, "violation");
+    }
+  }
+
+  useEffect(() => {
+    if (!exam) return;
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        registerViolation("Rời tab hoặc thu nhỏ trình duyệt");
+      }
+    };
+
+    const handleBlur = () => {
+      registerViolation("Cửa sổ thi bị mất tập trung");
+    };
+
+    const handleFullscreen = () => {
+      if (
+        examStartedRef.current &&
+        exam.requireFullscreen &&
+        !document.fullscreenElement
+      ) {
+        registerViolation("Thoát chế độ toàn màn hình");
+      }
+    };
+
+    const handleContextMenu = (event: MouseEvent) => {
+      if (examStartedRef.current && exam.blockCopyPaste) {
+        event.preventDefault();
+      }
+    };
+
+    const handleClipboard = (event: ClipboardEvent) => {
+      if (examStartedRef.current && exam.blockCopyPaste) {
+        event.preventDefault();
+        registerViolation("Sao chép hoặc dán nội dung");
+      }
+    };
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (examStartedRef.current && !submittedRef.current) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("fullscreenchange", handleFullscreen);
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("copy", handleClipboard);
+    document.addEventListener("paste", handleClipboard);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("fullscreenchange", handleFullscreen);
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("copy", handleClipboard);
+      document.removeEventListener("paste", handleClipboard);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [exam]);
+
+  async function handleStartExam() {
     if (!studentName.trim()) {
       setMessage(
         "Vui lòng nhập họ và tên trước khi bắt đầu."
@@ -279,8 +427,24 @@ export default function LamBaiPage() {
 
     if (!exam) return;
 
+    if (exam.requireFullscreen && !document.fullscreenElement) {
+      try {
+        await document.documentElement.requestFullscreen();
+      } catch {
+        setMessage(
+          "Trình duyệt không cho mở toàn màn hình. Hãy cho phép rồi thử lại."
+        );
+        setMessageType("error");
+        return;
+      }
+    }
+
     setSelectedAnswers({});
     selectedAnswersRef.current = {};
+    setViolationCount(0);
+    setViolationLog([]);
+    violationCountRef.current = 0;
+    violationLogRef.current = [];
     startedAtRef.current = Date.now();
     submittingRef.current = false;
     setResultSaved(false);
@@ -305,7 +469,10 @@ export default function LamBaiPage() {
     }));
   }
 
-  async function submitExam(autoSubmit = false) {
+  async function submitExam(
+    autoSubmit = false,
+    reason: "manual" | "time_up" | "violation" = "manual"
+  ) {
     if (
       !exam ||
       submitted ||
@@ -420,6 +587,14 @@ export default function LamBaiPage() {
           correct_count: correctCount,
           total_questions: exam.questions.length,
           used_seconds: usedSeconds,
+          violation_count: violationCountRef.current,
+          violation_log: violationLogRef.current,
+          submit_reason:
+            reason === "violation"
+              ? "violation"
+              : autoSubmit
+                ? "time_up"
+                : "manual",
         })
         .select("id")
         .single();
@@ -461,9 +636,11 @@ export default function LamBaiPage() {
       setSubmitted(true);
       setResultSaved(true);
       setMessage(
-        autoSubmit
-          ? "Đã hết thời gian. Hệ thống đã tự động nộp bài."
-          : "Đã nộp bài và lưu kết quả thành công."
+        reason === "violation"
+          ? "Bài đã tự động nộp do vượt số lần vi phạm."
+          : autoSubmit
+            ? "Đã hết thời gian. Hệ thống đã tự động nộp bài."
+            : "Đã nộp bài và lưu kết quả thành công."
       );
       setMessageType(
         autoSubmit ? "info" : "success"
@@ -491,7 +668,7 @@ export default function LamBaiPage() {
           window.clearInterval(timer);
 
           window.setTimeout(() => {
-            submitExam(true);
+            submitExam(true, "time_up");
           }, 0);
 
           return 0;
@@ -512,6 +689,10 @@ export default function LamBaiPage() {
     setSubmitted(false);
     setExamStarted(false);
     setResultSaved(false);
+    setViolationCount(0);
+    setViolationLog([]);
+    violationCountRef.current = 0;
+    violationLogRef.current = [];
     setTimeLeft(exam.durationMinutes * 60);
     setMessage("");
     startedAtRef.current = null;
@@ -610,8 +791,10 @@ export default function LamBaiPage() {
             </span>
 
             <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold">
-              Đã trả lời {answeredCount}/
-              {exam.questions.length}
+              Đã trả lời {answeredCount}/{exam.questions.length}
+            </span>
+            <span className="rounded-full bg-red-500/30 px-4 py-2 text-sm font-semibold">
+              Vi phạm {violationCount}/{exam.maxViolations}
             </span>
           </div>
         </section>
