@@ -221,8 +221,8 @@ export default function DangNhapPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-5 sm:px-6 sm:py-7">
-      <div className="mx-auto grid max-w-4xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
+    <main className="min-h-screen bg-slate-100 px-3 py-3 sm:px-5 sm:py-5">
+      <div className="mx-auto grid w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-lg lg:max-w-4xl lg:grid-cols-[0.9fr_1.1fr] lg:rounded-3xl">
         <section className="hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-8 text-white lg:flex lg:flex-col lg:justify-between">
           <div>
             <Link href="/" className="text-2xl font-extrabold">
@@ -254,12 +254,12 @@ export default function DangNhapPage() {
           </p>
         </section>
 
-        <section className="p-5 sm:p-6 md:p-7">
+        <section className="p-4 sm:p-5 md:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <Link
                 href="/"
-                className="text-xl font-extrabold text-blue-700 lg:hidden"
+                className="text-lg font-extrabold text-blue-700 lg:hidden"
               >
                 Quiz Sinh Viên
               </Link>
@@ -268,7 +268,7 @@ export default function DangNhapPage() {
                 Tài khoản
               </p>
 
-              <h2 className="mt-1 text-2xl font-extrabold text-slate-900">
+              <h2 className="mt-1 text-xl font-extrabold text-slate-900 sm:text-2xl">
                 {mode === "login"
                   ? "Chào mừng trở lại"
                   : "Tạo tài khoản mới"}
@@ -277,13 +277,13 @@ export default function DangNhapPage() {
 
             <Link
               href="/"
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 sm:rounded-xl sm:px-4 sm:text-sm"
             >
               Trang chủ
             </Link>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+          <div className="mt-4 grid grid-cols-2 rounded-xl bg-slate-100 p-1">
             <button
               type="button"
               onClick={() => {
@@ -292,8 +292,8 @@ export default function DangNhapPage() {
               }}
               className={
                 mode === "login"
-                  ? "rounded-xl bg-white px-4 py-2.5 font-bold text-blue-700 shadow-sm"
-                  : "rounded-xl px-4 py-2.5 font-bold text-slate-500"
+                  ? "rounded-lg bg-white px-3 py-2 text-sm font-bold text-blue-700 shadow-sm"
+                  : "rounded-lg px-3 py-2 text-sm font-bold text-slate-500"
               }
             >
               Đăng nhập
@@ -307,8 +307,8 @@ export default function DangNhapPage() {
               }}
               className={
                 mode === "register"
-                  ? "rounded-xl bg-white px-4 py-2.5 font-bold text-blue-700 shadow-sm"
-                  : "rounded-xl px-4 py-2.5 font-bold text-slate-500"
+                  ? "rounded-lg bg-white px-3 py-2 text-sm font-bold text-blue-700 shadow-sm"
+                  : "rounded-lg px-3 py-2 text-sm font-bold text-slate-500"
               }
             >
               Đăng ký
@@ -331,12 +331,12 @@ export default function DangNhapPage() {
             onSubmit={
               mode === "login" ? handleLogin : handleRegister
             }
-            className="mt-5 space-y-4"
+            className="mt-4 space-y-3"
           >
             {mode === "register" && (
               <>
                 <div>
-                  <label className="mb-1.5 block text-sm font-bold text-slate-700">
+                  <label className="mb-1 block text-xs font-bold text-slate-700 sm:text-sm">
                     Họ và tên
                   </label>
 
@@ -347,13 +347,13 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setFullName(event.target.value)
                     }
-                    className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:h-11 sm:rounded-xl sm:px-4"
                     placeholder="Nhập đầy đủ họ và tên"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-sm font-bold text-slate-700">
+                  <label className="mb-1 block text-xs font-bold text-slate-700 sm:text-sm">
                     Loại tài khoản
                   </label>
 
@@ -362,7 +362,7 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setRole(event.target.value as Role)
                     }
-                    className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:h-11 sm:rounded-xl sm:px-4"
                   >
                     <option value="student">
                       Học sinh / Sinh viên
@@ -374,7 +374,7 @@ export default function DangNhapPage() {
             )}
 
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-slate-700">
+              <label className="mb-1 block text-xs font-bold text-slate-700 sm:text-sm">
                 Email
               </label>
 
@@ -383,13 +383,13 @@ export default function DangNhapPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:h-11 sm:rounded-xl sm:px-4"
                 placeholder="tenban@example.com"
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-slate-700">
+              <label className="mb-1 block text-xs font-bold text-slate-700 sm:text-sm">
                 Mật khẩu
               </label>
 
@@ -405,7 +405,7 @@ export default function DangNhapPage() {
                   onChange={(event) =>
                     setPassword(event.target.value)
                   }
-                  className="min-h-11 w-full rounded-xl border border-slate-300 py-2.5 pl-4 pr-20 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  className="h-10 w-full rounded-lg border border-slate-300 pl-3 pr-16 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:h-11 sm:rounded-xl sm:pl-4 sm:pr-20"
                   placeholder="Ít nhất 6 ký tự"
                 />
 
@@ -414,7 +414,7 @@ export default function DangNhapPage() {
                   onClick={() =>
                     setShowPassword((current) => !current)
                   }
-                  className="absolute inset-y-0 right-0 px-4 text-sm font-bold text-blue-700"
+                  className="absolute inset-y-0 right-0 px-3 text-xs font-bold text-blue-700 sm:px-4 sm:text-sm"
                 >
                   {showPassword ? "Ẩn" : "Hiện"}
                 </button>
@@ -423,7 +423,7 @@ export default function DangNhapPage() {
 
             {mode === "register" && (
               <div>
-                <label className="mb-1.5 block text-sm font-bold text-slate-700">
+                <label className="mb-1 block text-xs font-bold text-slate-700 sm:text-sm">
                   Nhập lại mật khẩu
                 </label>
 
@@ -437,7 +437,7 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setConfirmPassword(event.target.value)
                     }
-                    className="min-h-11 w-full rounded-xl border border-slate-300 py-2.5 pl-4 pr-20 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    className="h-10 w-full rounded-lg border border-slate-300 pl-3 pr-16 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:h-11 sm:rounded-xl sm:pl-4 sm:pr-20"
                     placeholder="Nhập lại mật khẩu"
                   />
 
@@ -448,7 +448,7 @@ export default function DangNhapPage() {
                         (current) => !current
                       )
                     }
-                    className="absolute inset-y-0 right-0 px-4 text-sm font-bold text-blue-700"
+                    className="absolute inset-y-0 right-0 px-3 text-xs font-bold text-blue-700 sm:px-4 sm:text-sm"
                   >
                     {showConfirmPassword ? "Ẩn" : "Hiện"}
                   </button>
@@ -482,7 +482,7 @@ export default function DangNhapPage() {
             <button
               type="submit"
               disabled={loading}
-              className="min-h-12 w-full rounded-xl bg-blue-600 px-6 py-3 font-extrabold text-white hover:bg-blue-700 disabled:opacity-50"
+              className="h-11 w-full rounded-lg bg-blue-600 px-5 text-sm font-extrabold text-white hover:bg-blue-700 disabled:opacity-50 sm:h-12 sm:rounded-xl sm:text-base"
             >
               {loading
                 ? "Đang xử lý..."
@@ -492,7 +492,7 @@ export default function DangNhapPage() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-xs leading-5 text-slate-500">
+          <p className="mt-3 text-center text-[11px] leading-4 text-slate-500 sm:text-xs sm:leading-5">
             Website không lưu mật khẩu thật. Trình duyệt có thể đề
             nghị lưu mật khẩu.
           </p>
