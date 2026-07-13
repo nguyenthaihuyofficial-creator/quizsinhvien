@@ -60,6 +60,58 @@ interface AssignmentItem extends AssignmentRow {
   status: ExamStatus;
 }
 
+type AssignmentDisplayStatus =
+  | "new"
+  | "upcoming"
+  | "due_soon"
+  | "expired"
+  | "closed";
+
+function getAssignmentDisplayStatus(
+  assignment: AssignmentItem,
+  now: number
+): AssignmentDisplayStatus {
+  const startTime = assignment.start_at
+    ? new Date(assignment.start_at).getTime()
+    : null;
+  const dueTime = assignment.due_at
+    ? new Date(assignment.due_at).getTime()
+    : null;
+
+  if (!assignment.is_active || assignment.status !== "published") {
+    return "closed";
+  }
+
+  if (startTime !== null && now < startTime) return "upcoming";
+  if (dueTime !== null && now > dueTime) return "expired";
+
+  if (
+    dueTime !== null &&
+    dueTime - now <= 24 * 60 * 60 * 1000
+  ) {
+    return "due_soon";
+  }
+
+  return "new";
+}
+
+function getAssignmentStatusLabel(status: AssignmentDisplayStatus) {
+  if (status === "upcoming") return "Chưa đến giờ";
+  if (status === "due_soon") return "Sắp hết hạn";
+  if (status === "expired") return "Đã hết hạn";
+  if (status === "closed") return "Đã đóng";
+  return "Bài mới";
+}
+
+function getAssignmentStatusClass(status: AssignmentDisplayStatus) {
+  if (status === "due_soon") return "bg-amber-100 text-amber-700";
+  if (status === "expired" || status === "closed") {
+    return "bg-slate-200 text-slate-700";
+  }
+  if (status === "upcoming") return "bg-violet-100 text-violet-700";
+  return "bg-emerald-100 text-emerald-700";
+}
+
 function formatDate(value: string | null) {
   if (!value) return "Không giới hạn";
 
@@ -467,6 +519,24 @@ export default function ChiTietLopHocPage() {
     [availableExams, assignedExamIds]
   );
 
+  const assignmentSummary = useMemo(() => {
+    const now = Date.now();
+
+    return assignments.reduce(
+      (summary, assignment) => {
+        const status = getAssignmentDisplayStatus(assignment, now);
+
+        if (status === "new") summary.available += 1;
+        if (status === "upcoming") summary.upcoming += 1;
+        if (status === "due_soon") summary.dueSoon += 1;
+        if (status === "expired") summary.expired += 1;
+
+        return summary;
+      },
+      { available: 0, upcoming: 0, dueSoon: 0, expired: 0 }
+    );
+  }, [assignments]);
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-6">
@@ -575,6 +645,63 @@ export default function ChiTietLopHocPage() {
           </div>
         )}
 
+        {!canManage && assignments.length > 0 && (
+          <section className="mt-8 rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <p className="text-sm font-extrabold uppercase tracking-wider text-blue-600">
+                  Thông báo học tập
+                </p>
+                <h2 className="mt-1 text-2xl font-extrabold">
+                  Bài tập trong lớp
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Theo dõi bài mới, thời gian bắt đầu và hạn nộp để không bỏ lỡ bài tập.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white px-5 py-4 text-center shadow-sm ring-1 ring-blue-100">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Có thể làm ngay
+                </p>
+                <p className="mt-1 text-3xl font-extrabold text-blue-700">
+                  {assignmentSummary.available + assignmentSummary.dueSoon}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-emerald-100">
+                <p className="text-xs font-bold text-slate-500">Bài mới</p>
+                <p className="mt-1 text-2xl font-extrabold text-emerald-700">
+                  {assignmentSummary.available}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-amber-100">
+                <p className="text-xs font-bold text-slate-500">Sắp hết hạn</p>
+                <p className="mt-1 text-2xl font-extrabold text-amber-700">
+                  {assignmentSummary.dueSoon}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-violet-100">
+                <p className="text-xs font-bold text-slate-500">Chưa đến giờ</p>
+                <p className="mt-1 text-2xl font-extrabold text-violet-700">
+                  {assignmentSummary.upcoming}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                <p className="text-xs font-bold text-slate-500">Đã hết hạn</p>
+                <p className="mt-1 text-2xl font-extrabold text-slate-700">
+                  {assignmentSummary.expired}
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
         <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_380px]">
           <div className="space-y-6">
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -601,22 +728,13 @@ export default function ChiTietLopHocPage() {
                 <div className="mt-6 space-y-4">
                   {assignments.map((assignment) => {
                     const now = Date.now();
-                    const startTime = assignment.start_at
-                      ? new Date(assignment.start_at).getTime()
-                      : null;
-                    const dueTime = assignment.due_at
-                      ? new Date(assignment.due_at).getTime()
-                      : null;
-
-                    const notStarted =
-                      startTime !== null && now < startTime;
-                    const expired =
-                      dueTime !== null && now > dueTime;
+                    const displayStatus =
+                      getAssignmentDisplayStatus(assignment, now);
+                    const notStarted = displayStatus === "upcoming";
+                    const expired = displayStatus === "expired";
                     const canStart =
-                      assignment.is_active &&
-                      assignment.status === "published" &&
-                      !notStarted &&
-                      !expired;
+                      displayStatus === "new" ||
+                      displayStatus === "due_soon";
 
                     return (
                       <article
@@ -625,9 +743,19 @@ export default function ChiTietLopHocPage() {
                       >
                         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                           <div>
-                            <h3 className="text-lg font-extrabold">
-                              {assignment.title}
-                            </h3>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-lg font-extrabold">
+                                {assignment.title}
+                              </h3>
+
+                              <span
+                                className={`rounded-full px-3 py-1 text-xs font-bold ${getAssignmentStatusClass(
+                                  displayStatus
+                                )}`}
+                              >
+                                {getAssignmentStatusLabel(displayStatus)}
+                              </span>
+                            </div>
 
                             <p className="mt-2 text-sm text-slate-500">
                               Thời gian làm:{" "}
@@ -666,7 +794,9 @@ export default function ChiTietLopHocPage() {
                                   ? "Chưa đến giờ"
                                   : expired
                                     ? "Đã hết hạn"
-                                    : "Làm bài"}
+                                    : displayStatus === "closed"
+                                      ? "Đã đóng"
+                                      : "Làm bài ngay"}
                               </button>
                             )}
 

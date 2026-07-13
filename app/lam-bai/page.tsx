@@ -123,14 +123,27 @@ export default function LamBaiPage() {
     try {
       setPageLoading(true);
 
-      const selectedExamId =
+      const searchParams = new URLSearchParams(
+        window.location.search
+      );
+
+      const examIdFromUrl = searchParams.get("examId");
+      const examIdFromStorage =
         localStorage.getItem("selectedExamId");
+
+      const selectedExamId =
+        examIdFromUrl || examIdFromStorage;
 
       if (!selectedExamId) {
         setMessage("Chưa chọn đề thi để làm.");
         setMessageType("error");
         return;
       }
+
+      localStorage.setItem(
+        "selectedExamId",
+        selectedExamId
+      );
 
       const supabase = createClient();
 
@@ -807,7 +820,7 @@ export default function LamBaiPage() {
             htmlFor="student-name"
             className="mb-2 block text-sm font-bold text-slate-700"
           >
-            Họ và tên học sinh
+            Họ và tên học sinh / sinh viên
           </label>
 
           <input
@@ -1098,7 +1111,7 @@ export default function LamBaiPage() {
           </Link>
 
           <Link
-            href="/lam-bai"
+            href="/de-thi"
             className="flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] font-semibold text-blue-600"
           >
             <span className="text-xl">🎯</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import QRCode from "react-qr-code";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "../lib/supabase/client";
 
@@ -49,6 +50,7 @@ export default function DeThiPage() {
   const [messageType, setMessageType] =
     useState<"success" | "error" | "info">("info");
   const [deletingId, setDeletingId] = useState("");
+  const [qrExam, setQrExam] = useState<Exam | null>(null);
 
   useEffect(() => {
     loadExams();
@@ -149,7 +151,35 @@ export default function DeThiPage() {
     }
 
     localStorage.setItem("selectedExamId", exam.id);
-    window.location.href = "/lam-bai";
+    window.location.href = `/lam-bai?examId=${encodeURIComponent(
+      exam.id
+    )}`;
+  }
+
+  function getExamLink(examId: string) {
+    return `https://quizsinhvien.vn/lam-bai?examId=${encodeURIComponent(
+      examId
+    )}`;
+  }
+
+  function getExamCode(examId: string) {
+    return examId.replace(/-/g, "").slice(0, 6).toUpperCase();
+  }
+
+  async function handleCopyLink(exam: Exam) {
+    try {
+      await navigator.clipboard.writeText(
+        getExamLink(exam.id)
+      );
+
+      setMessage(
+        `Đã sao chép link đề "${exam.title}".`
+      );
+      setMessageType("success");
+    } catch {
+      setMessage("Không thể sao chép link đề.");
+      setMessageType("error");
+    }
   }
 
   function handleEditExam(exam: Exam) {
@@ -533,6 +563,39 @@ export default function DeThiPage() {
                   </div>
                 </div>
 
+                {exam.status === "published" && (
+                  <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+                    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                          Mã chia sẻ
+                        </p>
+                        <p className="mt-1 text-xl font-extrabold tracking-[0.2em] text-blue-800">
+                          {getExamCode(exam.id)}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopyLink(exam)}
+                          className="min-h-10 rounded-xl bg-white px-4 text-sm font-bold text-blue-700 ring-1 ring-blue-200 hover:bg-blue-100"
+                        >
+                          Sao chép link
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setQrExam(exam)}
+                          className="min-h-10 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white hover:bg-blue-700"
+                        >
+                          Mở mã QR
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div
                   className={`mt-5 grid gap-3 ${
                     canManage
@@ -596,6 +659,62 @@ export default function DeThiPage() {
           </section>
         )}
       </div>
+      {qrExam && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-4"
+          onClick={() => setQrExam(null)}
+        >
+          <section
+            className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 text-left">
+              <div>
+                <p className="text-sm font-bold text-blue-600">
+                  Quét để làm bài
+                </p>
+                <h2 className="mt-1 text-xl font-extrabold text-slate-900">
+                  {qrExam.title}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setQrExam(null)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-600 hover:bg-slate-200"
+                aria-label="Đóng mã QR"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mx-auto mt-6 w-fit rounded-2xl border border-slate-200 bg-white p-4">
+              <QRCode
+                value={getExamLink(qrExam.id)}
+                size={220}
+                level="H"
+              />
+            </div>
+
+            <p className="mt-5 text-sm text-slate-500">
+              Mã chia sẻ
+            </p>
+
+            <p className="mt-1 text-2xl font-extrabold tracking-[0.22em] text-blue-700">
+              {getExamCode(qrExam.id)}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => handleCopyLink(qrExam)}
+              className="mt-5 min-h-12 w-full rounded-xl bg-blue-600 px-5 font-bold text-white hover:bg-blue-700"
+            >
+              Sao chép link làm bài
+            </button>
+          </section>
+        </div>
+      )}
+
     </main>
   );
 }

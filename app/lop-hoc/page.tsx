@@ -152,8 +152,45 @@ export default function LopHocPage() {
     }
   }
 
+  async function handleDeleteClass(item: ClassItem) {
+    const confirmed = window.confirm(
+      `Bạn có chắc muốn xóa lớp "${item.name}" không? Hành động này không thể hoàn tác.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const supabase = createClient();
+
+      const { error } = await supabase
+        .from("classes")
+        .delete()
+        .eq("id", item.id);
+
+      if (error) throw error;
+
+      setClasses((current) =>
+        current.filter((classItem) => classItem.id !== item.id)
+      );
+
+      showMessage("Đã xóa lớp học.", "success");
+    } catch (error) {
+      showMessage(
+        error instanceof Error
+          ? error.message
+          : "Không thể xóa lớp học.",
+        "error"
+      );
+    }
+  }
+
   const canCreateClass = role === "teacher" || role === "admin";
-  const activeClasses = useMemo(() => classes.filter((item) => item.status === "active"), [classes]);
+  const sortedClasses = useMemo(() => {
+    return [...classes].sort((a, b) => {
+      if (a.status === b.status) return 0;
+      return a.status === "active" ? -1 : 1;
+    });
+  }, [classes]);
 
   const roleLabel = role === "admin" ? "Quản trị viên" : role === "teacher" ? "Giáo viên" : "Học sinh / Sinh viên";
 
@@ -242,14 +279,14 @@ export default function LopHocPage() {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <p className="text-sm font-extrabold uppercase tracking-wider text-blue-600">Danh sách của bạn</p>
-                <h2 className="mt-1 text-2xl font-extrabold">Lớp học đang hoạt động</h2>
+                <h2 className="mt-1 text-2xl font-extrabold">Tất cả lớp học</h2>
               </div>
-              <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700">{activeClasses.length} lớp</span>
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-bold text-blue-700">{sortedClasses.length} lớp</span>
             </div>
 
             {loading ? (
               <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500">Đang tải lớp học...</div>
-            ) : activeClasses.length === 0 ? (
+            ) : sortedClasses.length === 0 ? (
               <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
                 <div className="text-4xl">🏫</div>
                 <h3 className="mt-4 text-xl font-extrabold">Chưa có lớp học</h3>
@@ -259,13 +296,23 @@ export default function LopHocPage() {
               </div>
             ) : (
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {activeClasses.map((item) => {
+                {sortedClasses.map((item) => {
                   const isOwner = item.owner_id === userId;
                   return (
                     <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl">🏫</div>
-                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Đang hoạt động</span>
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            item.status === "active"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-slate-200 text-slate-700"
+                          }`}
+                        >
+                          {item.status === "active"
+                            ? "Đang hoạt động"
+                            : "Đã đóng"}
+                        </span>
                       </div>
 
                       <h3 className="mt-5 text-xl font-extrabold">{item.name}</h3>
@@ -283,12 +330,24 @@ export default function LopHocPage() {
                         </div>
                       </div>
 
-                      <Link
-                        href={`/lop-hoc/${item.id}`}
-                        className="mt-5 flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-blue-600"
-                      >
-                        {isOwner ? "Quản lý lớp" : "Xem lớp học"}
-                      </Link>
+                      <div className="mt-5 flex gap-3">
+                        <Link
+                          href={`/lop-hoc/${item.id}`}
+                          className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-blue-600"
+                        >
+                          {isOwner ? "Quản lý lớp" : "Xem lớp học"}
+                        </Link>
+
+                        {(isOwner || role === "admin") && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteClass(item)}
+                            className="min-h-11 rounded-xl bg-rose-600 px-4 text-sm font-bold text-white transition hover:bg-rose-700"
+                          >
+                            Xóa lớp
+                          </button>
+                        )}
+                      </div>
                     </article>
                   );
                 })}

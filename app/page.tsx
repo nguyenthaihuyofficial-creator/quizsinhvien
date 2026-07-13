@@ -299,13 +299,22 @@ export default function HomePage() {
             )}
 
             {!loadingUser && role ? (
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="min-h-11 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-slate-800"
-              >
-                Đăng xuất
-              </button>
+              <>
+                <Link
+                  href="/tai-khoan"
+                  className="flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 sm:px-4"
+                >
+                  Tài khoản
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="min-h-11 rounded-xl bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800 sm:px-4"
+                >
+                  Đăng xuất
+                </button>
+              </>
             ) : (
               <Link
                 href="/dang-nhap"
@@ -556,25 +565,31 @@ export default function HomePage() {
               {branding.site_name}
             </p>
             <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()}{" "}
-            <span className="font-bold text-white">
-              QuizSinhVien.Vn
-            </span>
-            . Phát triển bởi{" "}
-            <span className="font-bold text-cyan-400">
-              DarkTech
-            </span>
-            , thuộc hệ sinh thái{" "}
-            <span className="font-bold text-blue-400">
-              DarkGroup
-            </span>
-            .
-          </p>
+              © {new Date().getFullYear()}{" "}
+              <span className="font-bold text-white">
+                QuizSinhVien.Vn
+              </span>
+              . Phát triển bởi{" "}
+              <span className="font-bold text-cyan-400">
+                DarkTech
+              </span>
+              , thuộc hệ sinh thái{" "}
+              <span className="font-bold text-blue-400">
+                DarkGroup
+              </span>
+              .
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm text-slate-300">
             <Link href="/gioi-thieu" className="hover:text-white">
               Giới thiệu
+            </Link>
+            <Link href="/huong-dan" className="hover:text-white">
+              Hướng dẫn
+            </Link>
+            <Link href="/lien-he" className="hover:text-white">
+              Liên hệ
             </Link>
             <Link href="/de-thi" className="hover:text-white">
               Kho đề
