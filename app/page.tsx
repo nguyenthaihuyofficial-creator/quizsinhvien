@@ -202,8 +202,8 @@ export default function HomePage() {
           : "Khách";
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-20 text-slate-900 md:pb-0">
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fbff_0%,#f8fafc_34%,#ffffff_100%)] pb-20 text-slate-900 md:pb-0">
+      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 md:px-8">
           <Link
             href="/"
@@ -236,14 +236,14 @@ export default function HomePage() {
               <>
                 <Link
                   href="/trac-nghiem"
-                  className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
                 >
                   Tạo đề
                 </Link>
 
                 <Link
                   href="/ngan-hang-cau-hoi"
-                  className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
                 >
                   Ngân hàng
                 </Link>
@@ -252,35 +252,35 @@ export default function HomePage() {
 
             <Link
               href="/lop-hoc"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Lớp học
             </Link>
 
             <Link
               href="/de-thi"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Kho đề
             </Link>
 
             <Link
               href="/ket-qua"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Kết quả
             </Link>
 
             <Link
               href="/tinh-diem"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Tính điểm
             </Link>
 
             <Link
               href="/gioi-thieu"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Giới thiệu
             </Link>
@@ -288,7 +288,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-2">
             {!loadingUser && role && (
-              <div className="hidden rounded-2xl bg-slate-100 px-3 py-2 text-right lg:block">
+              <div className="hidden rounded-2xl bg-slate-50 px-3 py-2 text-right ring-1 ring-slate-200/80 lg:block">
                 <p className="max-w-40 truncate text-xs font-bold text-slate-800">
                   {fullName || "Tài khoản của bạn"}
                 </p>
@@ -302,7 +302,7 @@ export default function HomePage() {
               <>
                 <Link
                   href="/tai-khoan"
-                  className="flex min-h-11 items-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 sm:px-4"
+                  className="flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 sm:px-4"
                 >
                   Tài khoản
                 </Link>
@@ -310,7 +310,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="min-h-11 rounded-xl bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800 sm:px-4"
+                  className="min-h-11 rounded-full bg-slate-900 px-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-slate-800 sm:px-4"
                 >
                   Đăng xuất
                 </button>
@@ -318,7 +318,7 @@ export default function HomePage() {
             ) : (
               <Link
                 href="/dang-nhap"
-                className="flex min-h-11 items-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700"
+                className="flex min-h-11 items-center rounded-full bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700"
               >
                 Đăng nhập
               </Link>
@@ -327,17 +327,17 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-600 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_34%)]" />
+      <section className="relative overflow-hidden bg-[linear-gradient(135deg,#0f4fd6_0%,#2563eb_48%,#06b6d4_100%)] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.28),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.12),transparent_34%)]" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-18 md:px-8 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:py-24">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-blue-50">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-semibold text-blue-50 shadow-sm backdrop-blur">
               <span className="h-2 w-2 rounded-full bg-emerald-300" />
               {branding.slogan}
             </div>
 
-            <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-5xl lg:text-6xl">
               Học tập và kiểm tra trực tuyến
               <span className="block text-cyan-100">
                 rõ ràng, nhanh và dễ sử dụng
@@ -353,7 +353,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/de-thi"
-                className="flex min-h-12 items-center justify-center rounded-xl bg-white px-6 font-extrabold text-blue-700 shadow-lg shadow-blue-900/10 transition hover:bg-blue-50"
+                className="flex min-h-12 items-center justify-center rounded-full bg-white px-6 font-semibold text-blue-700 shadow-lg shadow-blue-900/10 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-50"
               >
                 Chọn đề để làm
               </Link>
@@ -361,7 +361,7 @@ export default function HomePage() {
               {canCreateExam && (
                 <Link
                   href="/trac-nghiem"
-                  className="flex min-h-12 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-6 font-extrabold text-white transition hover:bg-white/20"
+                  className="flex min-h-12 items-center justify-center rounded-full border border-white/25 bg-white/10 px-6 font-semibold text-white backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                 >
                   Tạo đề trắc nghiệm
                 </Link>
@@ -370,7 +370,7 @@ export default function HomePage() {
               {!role && (
                 <Link
                   href="/dang-nhap"
-                  className="flex min-h-12 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-6 font-extrabold text-white transition hover:bg-white/20"
+                  className="flex min-h-12 items-center justify-center rounded-full border border-white/25 bg-white/10 px-6 font-semibold text-white backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                 >
                   Đăng nhập / Đăng ký
                 </Link>
@@ -385,7 +385,7 @@ export default function HomePage() {
               ].map(([value, label]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur"
+                  className="rounded-2xl border border-white/15 bg-white/10 p-4 shadow-sm backdrop-blur"
                 >
                   <p className="text-base font-extrabold sm:text-lg">
                     {value}
@@ -398,7 +398,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/20 bg-white/10 p-3 shadow-2xl backdrop-blur sm:p-4">
+          <div className="rounded-[2rem] border border-white/20 bg-white/12 p-3 shadow-[0_30px_80px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:p-4">
             {branding.banner_url ? (
               <Image
                 src={branding.banner_url}
@@ -410,7 +410,7 @@ export default function HomePage() {
                 priority
               />
             ) : (
-              <div className="rounded-[1.5rem] bg-white p-5 text-slate-900 sm:p-6">
+              <div className="rounded-[1.5rem] bg-white/95 p-5 text-slate-900 shadow-sm sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-bold text-blue-600">
@@ -481,16 +481,16 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-blue-600">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue-600">
                 Chức năng dành cho bạn
               </p>
 
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+              <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-900 md:text-4xl">
                 Học và làm bài theo cách đơn giản hơn
               </h2>
             </div>
 
-            <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200">
+            <div className="rounded-full bg-white px-4 py-3 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200/80">
               Vai trò hiện tại:{" "}
               <span className="font-extrabold text-slate-900">
                 {roleLabel}
@@ -502,25 +502,25 @@ export default function HomePage() {
             {visibleFeatures.map((feature) => (
               <article
                 key={`${feature.href}-${feature.title}`}
-                className="group flex min-h-64 flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl"
+                className="group flex min-h-64 flex-col rounded-[1.75rem] bg-white p-6 shadow-[0_14px_40px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/70 transition duration-200 hover:-translate-y-1.5 hover:shadow-[0_22px_55px_rgba(37,99,235,0.12)]"
               >
                 <div
-                  className={`flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${feature.accent}`}
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl text-2xl shadow-sm ring-1 ring-black/5 ${feature.accent}`}
                 >
                   {feature.icon}
                 </div>
 
-                <h3 className="mt-5 text-xl font-extrabold text-slate-900">
+                <h3 className="mt-5 text-xl font-bold text-slate-900">
                   {feature.title}
                 </h3>
 
-                <p className="mt-3 flex-1 leading-7 text-slate-600">
+                <p className="mt-3 flex-1 leading-7 text-slate-500">
                   {feature.description}
                 </p>
 
                 <Link
                   href={feature.href}
-                  className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition group-hover:bg-blue-600"
+                  className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white transition duration-200 group-hover:-translate-y-0.5 group-hover:bg-blue-600"
                 >
                   {feature.buttonText}
                 </Link>
@@ -530,7 +530,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-white px-4 py-14 sm:px-6 md:px-8 md:py-18">
+      <section className="border-y border-slate-200/70 bg-white/80 px-4 py-14 backdrop-blur sm:px-6 md:px-8 md:py-18">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-5 md:grid-cols-4">
             {[
@@ -541,12 +541,12 @@ export default function HomePage() {
             ].map(([number, title, description]) => (
               <article
                 key={number}
-                className="rounded-3xl bg-slate-50 p-6"
+                className="rounded-[1.5rem] bg-slate-50/80 p-6 ring-1 ring-slate-200/70"
               >
                 <p className="text-sm font-extrabold text-blue-600">
                   BƯỚC {number}
                 </p>
-                <h3 className="mt-3 text-xl font-extrabold">
+                <h3 className="mt-3 text-xl font-bold">
                   {title}
                 </h3>
                 <p className="mt-2 leading-7 text-slate-600">
@@ -558,10 +558,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="bg-slate-950 px-4 py-10 text-white sm:px-6 md:px-8">
+      <footer className="bg-[linear-gradient(180deg,#0f172a_0%,#020617_100%)] px-4 py-10 text-white sm:px-6 md:px-8">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 md:flex-row md:items-center">
           <div>
-            <p className="text-xl font-extrabold">
+            <p className="text-xl font-bold">
               {branding.site_name}
             </p>
             <p className="text-sm text-slate-400">
@@ -604,7 +604,7 @@ export default function HomePage() {
         </div>
       </footer>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/90 shadow-[0_-10px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl md:hidden">
         <div className="grid grid-cols-6">
           <Link
             href="/"
