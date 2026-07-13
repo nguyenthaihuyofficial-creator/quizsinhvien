@@ -128,6 +128,8 @@ export default function HomePage() {
   const [role, setRole] = useState<UserRole | null>(null);
   const [fullName, setFullName] = useState("");
   const [loadingUser, setLoadingUser] = useState(true);
+  const [unreadNotificationCount, setUnreadNotificationCount] =
+    useState(0);
   const [branding, setBranding] =
     useState<BrandingSettings>(defaultBranding);
 
@@ -175,6 +177,32 @@ export default function HomePage() {
       if (profile) {
         setFullName(profile.full_name || "");
         setRole(profile.role as UserRole);
+
+        const [
+          { data: notificationRows },
+          { data: readRows },
+        ] = await Promise.all([
+          supabase
+            .from("notifications")
+            .select("id")
+            .eq("is_active", true),
+          supabase
+            .from("notification_reads")
+            .select("notification_id")
+            .eq("user_id", user.id),
+        ]);
+
+        const readIdSet = new Set(
+          (readRows || []).map(
+            (item) => item.notification_id as string
+          )
+        );
+
+        setUnreadNotificationCount(
+          (notificationRows || []).filter(
+            (item) => !readIdSet.has(item.id as string)
+          ).length
+        );
       }
     } finally {
       setLoadingUser(false);
@@ -295,6 +323,22 @@ export default function HomePage() {
               Tài liệu
             </Link>
 
+            {role && (
+              <Link
+                href="/thong-bao"
+                className="relative rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
+              >
+                Thông báo
+                {unreadNotificationCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                    {unreadNotificationCount > 99
+                      ? "99+"
+                      : unreadNotificationCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             <Link
               href="/gioi-thieu"
               className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
@@ -317,6 +361,21 @@ export default function HomePage() {
 
             {!loadingUser && role ? (
               <>
+                <Link
+                  href="/thong-bao"
+                  aria-label="Thông báo"
+                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-lg shadow-sm transition duration-200 hover:border-blue-300 hover:bg-blue-50"
+                >
+                  🔔
+                  {unreadNotificationCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                      {unreadNotificationCount > 99
+                        ? "99+"
+                        : unreadNotificationCount}
+                    </span>
+                  )}
+                </Link>
+
                 <Link
                   href="/tai-khoan"
                   className="flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 sm:px-4"
@@ -608,6 +667,11 @@ export default function HomePage() {
             <Link href="/lien-he" className="hover:text-white">
               Liên hệ
             </Link>
+            {role && (
+              <Link href="/thong-bao" className="hover:text-white">
+                Thông báo
+              </Link>
+            )}
             <Link href="/tai-lieu" className="hover:text-white">
               Tài liệu
             </Link>
@@ -625,7 +689,7 @@ export default function HomePage() {
       </footer>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/90 shadow-[0_-10px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl md:hidden">
-        <div className="grid grid-cols-7">
+        <div className={`grid ${role ? "grid-cols-8" : "grid-cols-7"}`}>
           <Link
             href="/"
             className="flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-bold text-blue-600"
@@ -667,6 +731,23 @@ export default function HomePage() {
             </span>
             {canCreateExam ? "Tạo đề" : "Làm bài"}
           </Link>
+
+          {role && (
+            <Link
+              href="/thong-bao"
+              className="relative flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-semibold text-slate-600"
+            >
+              <span className="text-lg">🔔</span>
+              Thông báo
+              {unreadNotificationCount > 0 && (
+                <span className="absolute right-1 top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+                  {unreadNotificationCount > 9
+                    ? "9+"
+                    : unreadNotificationCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           <Link
             href="/ket-qua"
