@@ -282,6 +282,20 @@ export default function AdminPage() {
 
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/admin/dashboard"
+              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
+            >
+              Dashboard tổng quan
+            </Link>
+
+            <Link
+              href="/tai-lieu"
+              className="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-700"
+            >
+              Kho tài liệu
+            </Link>
+
+            <Link
               href="/admin/thuong-hieu"
               className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-700"
             >
