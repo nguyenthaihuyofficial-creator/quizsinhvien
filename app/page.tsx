@@ -103,6 +103,16 @@ const features: FeatureItem[] = [
     roles: ["student", "teacher", "admin"],
   },
   {
+    title: "Kho tài liệu tham khảo",
+    description:
+      "Tìm kiếm và tải về tài liệu học tập do giáo viên, quản trị viên chia sẻ công khai.",
+    href: "/tai-lieu",
+    buttonText: "Mở kho tài liệu",
+    icon: "📂",
+    accent: "bg-teal-50 text-teal-700",
+    roles: ["student", "teacher", "admin"],
+  },
+  {
     title: "Quản trị hệ thống",
     description:
       "Quản lý tài khoản, phân quyền và cấu hình thương hiệu của website.",
@@ -276,6 +286,13 @@ export default function HomePage() {
               className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
             >
               Tính điểm
+            </Link>
+
+            <Link
+              href="/tai-lieu"
+              className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition duration-200 hover:bg-blue-50 hover:text-blue-700"
+            >
+              Tài liệu
             </Link>
 
             <Link
@@ -591,6 +608,9 @@ export default function HomePage() {
             <Link href="/lien-he" className="hover:text-white">
               Liên hệ
             </Link>
+            <Link href="/tai-lieu" className="hover:text-white">
+              Tài liệu
+            </Link>
             <Link href="/de-thi" className="hover:text-white">
               Kho đề
             </Link>
@@ -605,7 +625,7 @@ export default function HomePage() {
       </footer>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/90 shadow-[0_-10px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl md:hidden">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           <Link
             href="/"
             className="flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-bold text-blue-600"
@@ -628,6 +648,14 @@ export default function HomePage() {
           >
             <span className="text-lg">📚</span>
             Kho đề
+          </Link>
+
+          <Link
+            href="/tai-lieu"
+            className="flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-semibold text-slate-600"
+          >
+            <span className="text-lg">📂</span>
+            Tài liệu
           </Link>
 
           <Link
