@@ -379,9 +379,9 @@ export default function HomePage() {
 
             <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3">
               {[
-                ["10 điểm", "Chấm tự động"],
-                ["Mọi thiết bị", "Responsive"],
-                ["An toàn", "Theo dõi bài thi"],
+                ["Chấm tự động", "Kết quả tức thì"],
+                ["Đa nền tảng", "Điện thoại • Máy tính"],
+                ["Bảo mật", "Theo dõi phiên làm bài"],
               ].map(([value, label]) => (
                 <div
                   key={label}
