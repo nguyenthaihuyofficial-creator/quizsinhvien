@@ -221,9 +221,9 @@ export default function DangNhapPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8 sm:px-6">
-      <div className="mx-auto grid max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
-        <section className="hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+    <main className="min-h-screen bg-slate-100 px-4 py-5 sm:px-6 sm:py-7">
+      <div className="mx-auto grid max-w-4xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 p-8 text-white lg:flex lg:flex-col lg:justify-between">
           <div>
             <Link href="/" className="text-2xl font-extrabold">
               Quiz Sinh Viên
@@ -239,11 +239,11 @@ export default function DangNhapPage() {
               Hệ thống tài khoản
             </p>
 
-            <h1 className="mt-6 text-4xl font-extrabold leading-tight">
+            <h1 className="mt-5 text-3xl font-extrabold leading-tight">
               Đăng nhập để quản lý dữ liệu của riêng bạn
             </h1>
 
-            <p className="mt-5 leading-8 text-blue-100">
+            <p className="mt-4 leading-7 text-blue-100">
               Giáo viên quản lý đề thi, học sinh làm bài và quản trị
               viên quản lý toàn bộ hệ thống.
             </p>
@@ -254,7 +254,7 @@ export default function DangNhapPage() {
           </p>
         </section>
 
-        <section className="p-6 sm:p-8 md:p-10">
+        <section className="p-5 sm:p-6 md:p-7">
           <div className="flex items-start justify-between gap-4">
             <div>
               <Link
@@ -268,7 +268,7 @@ export default function DangNhapPage() {
                 Tài khoản
               </p>
 
-              <h2 className="mt-2 text-3xl font-extrabold text-slate-900">
+              <h2 className="mt-1 text-2xl font-extrabold text-slate-900">
                 {mode === "login"
                   ? "Chào mừng trở lại"
                   : "Tạo tài khoản mới"}
@@ -283,7 +283,7 @@ export default function DangNhapPage() {
             </Link>
           </div>
 
-          <div className="mt-7 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+          <div className="mt-5 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
             <button
               type="button"
               onClick={() => {
@@ -292,8 +292,8 @@ export default function DangNhapPage() {
               }}
               className={
                 mode === "login"
-                  ? "rounded-xl bg-white px-4 py-3 font-bold text-blue-700 shadow-sm"
-                  : "rounded-xl px-4 py-3 font-bold text-slate-500"
+                  ? "rounded-xl bg-white px-4 py-2.5 font-bold text-blue-700 shadow-sm"
+                  : "rounded-xl px-4 py-2.5 font-bold text-slate-500"
               }
             >
               Đăng nhập
@@ -307,8 +307,8 @@ export default function DangNhapPage() {
               }}
               className={
                 mode === "register"
-                  ? "rounded-xl bg-white px-4 py-3 font-bold text-blue-700 shadow-sm"
-                  : "rounded-xl px-4 py-3 font-bold text-slate-500"
+                  ? "rounded-xl bg-white px-4 py-2.5 font-bold text-blue-700 shadow-sm"
+                  : "rounded-xl px-4 py-2.5 font-bold text-slate-500"
               }
             >
               Đăng ký
@@ -331,12 +331,12 @@ export default function DangNhapPage() {
             onSubmit={
               mode === "login" ? handleLogin : handleRegister
             }
-            className="mt-6 space-y-5"
+            className="mt-5 space-y-4"
           >
             {mode === "register" && (
               <>
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">
                     Họ và tên
                   </label>
 
@@ -347,13 +347,13 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setFullName(event.target.value)
                     }
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                    className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     placeholder="Nhập đầy đủ họ và tên"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">
                     Loại tài khoản
                   </label>
 
@@ -362,7 +362,7 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setRole(event.target.value as Role)
                     }
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
+                    className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                   >
                     <option value="student">
                       Học sinh / Sinh viên
@@ -374,7 +374,7 @@ export default function DangNhapPage() {
             )}
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">
+              <label className="mb-1.5 block text-sm font-bold text-slate-700">
                 Email
               </label>
 
@@ -383,13 +383,13 @@ export default function DangNhapPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+                className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 placeholder="tenban@example.com"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">
+              <label className="mb-1.5 block text-sm font-bold text-slate-700">
                 Mật khẩu
               </label>
 
@@ -405,7 +405,7 @@ export default function DangNhapPage() {
                   onChange={(event) =>
                     setPassword(event.target.value)
                   }
-                  className="w-full rounded-xl border border-slate-300 py-3 pl-4 pr-20 outline-none focus:border-blue-500"
+                  className="min-h-11 w-full rounded-xl border border-slate-300 py-2.5 pl-4 pr-20 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                   placeholder="Ít nhất 6 ký tự"
                 />
 
@@ -423,7 +423,7 @@ export default function DangNhapPage() {
 
             {mode === "register" && (
               <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">
+                <label className="mb-1.5 block text-sm font-bold text-slate-700">
                   Nhập lại mật khẩu
                 </label>
 
@@ -437,7 +437,7 @@ export default function DangNhapPage() {
                     onChange={(event) =>
                       setConfirmPassword(event.target.value)
                     }
-                    className="w-full rounded-xl border border-slate-300 py-3 pl-4 pr-20 outline-none focus:border-blue-500"
+                    className="min-h-11 w-full rounded-xl border border-slate-300 py-2.5 pl-4 pr-20 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                     placeholder="Nhập lại mật khẩu"
                   />
 
@@ -482,7 +482,7 @@ export default function DangNhapPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 px-6 py-4 text-lg font-extrabold text-white hover:bg-blue-700 disabled:opacity-50"
+              className="min-h-12 w-full rounded-xl bg-blue-600 px-6 py-3 font-extrabold text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {loading
                 ? "Đang xử lý..."
@@ -492,7 +492,7 @@ export default function DangNhapPage() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-xs leading-5 text-slate-500">
+          <p className="mt-4 text-center text-xs leading-5 text-slate-500">
             Website không lưu mật khẩu thật. Trình duyệt có thể đề
             nghị lưu mật khẩu.
           </p>
@@ -501,14 +501,14 @@ export default function DangNhapPage() {
 
       {forgotOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
-          <section className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+          <section className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase text-blue-600">
                   Khôi phục tài khoản
                 </p>
 
-                <h2 className="mt-2 text-2xl font-extrabold">
+                <h2 className="mt-1 text-xl font-extrabold">
                   Quên mật khẩu
                 </h2>
               </div>
@@ -522,7 +522,7 @@ export default function DangNhapPage() {
               </button>
             </div>
 
-            <p className="mt-4 text-slate-600">
+            <p className="mt-3 text-sm leading-6 text-slate-600">
               Nhập email để nhận liên kết đặt lại mật khẩu.
             </p>
 
@@ -530,11 +530,11 @@ export default function DangNhapPage() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-5 w-full rounded-xl border border-slate-300 px-4 py-3"
+              className="mt-4 min-h-11 w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               placeholder="tenban@example.com"
             />
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => setForgotOpen(false)}
