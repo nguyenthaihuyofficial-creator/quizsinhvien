@@ -55,6 +55,12 @@ interface ResultItem {
   submittedAt: string;
 }
 
+interface TeacherStats {
+  examCount: number;
+  publishedExamCount: number;
+  attemptCount: number;
+}
+
 function formatDate(value: string) {
   const date = new Date(value);
 
@@ -72,6 +78,11 @@ export default function TaiKhoanPage() {
   const [fullName, setFullName] = useState("");
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [results, setResults] = useState<ResultItem[]>([]);
+  const [teacherStats, setTeacherStats] = useState<TeacherStats>({
+    examCount: 0,
+    publishedExamCount: 0,
+    attemptCount: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
@@ -155,8 +166,7 @@ export default function TaiKhoanPage() {
               `
             )
             .eq("user_id", user.id)
-            .order("submitted_at", { ascending: false })
-            .limit(10),
+            .order("submitted_at", { ascending: false }),
         ]);
 
         if (memberError) throw memberError;
@@ -203,19 +213,52 @@ export default function TaiKhoanPage() {
 
         setResults(normalizedResults);
       } else {
-        const { data: classRows, error: classError } =
-          await supabase
+        const [
+          { data: classRows, error: classError },
+          { data: examRows, error: examError },
+        ] = await Promise.all([
+          supabase
             .from("classes")
             .select(
               "id, name, subject, school_name, class_code, status"
             )
             .eq("owner_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(10);
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("exams")
+            .select("id, status")
+            .eq("owner_id", user.id),
+        ]);
 
         if (classError) throw classError;
+        if (examError) throw examError;
+
+        const ownedExams = (examRows || []) as {
+          id: string;
+          status: "draft" | "published" | "closed";
+        }[];
+
+        const examIds = ownedExams.map((item) => item.id);
+        let attemptCount = 0;
+
+        if (examIds.length > 0) {
+          const { count, error: attemptError } = await supabase
+            .from("exam_results")
+            .select("id", { count: "exact", head: true })
+            .in("exam_id", examIds);
+
+          if (attemptError) throw attemptError;
+          attemptCount = count || 0;
+        }
 
         setClasses((classRows || []) as ClassRow[]);
+        setTeacherStats({
+          examCount: ownedExams.length,
+          publishedExamCount: ownedExams.filter(
+            (item) => item.status === "published"
+          ).length,
+          attemptCount,
+        });
       }
     } catch (error) {
       showMessage(
@@ -331,6 +374,55 @@ export default function TaiKhoanPage() {
         0
       ) / results.length
     );
+  }, [results]);
+
+  const normalizedAverageScore = useMemo(() => {
+    if (results.length === 0) return 0;
+
+    return (
+      results.reduce((total, item) => {
+        if (item.maxScore <= 0) return total;
+        return total + (item.score / item.maxScore) * 10;
+      }, 0) / results.length
+    );
+  }, [results]);
+
+  const highestScore = useMemo(() => {
+    if (results.length === 0) return 0;
+
+    return Math.max(
+      ...results.map((item) =>
+        item.maxScore > 0
+          ? (item.score / item.maxScore) * 10
+          : 0
+      )
+    );
+  }, [results]);
+
+  const correctRate = useMemo(() => {
+    const totals = results.reduce(
+      (summary, item) => ({
+        correct: summary.correct + item.correctCount,
+        questions: summary.questions + item.totalQuestions,
+      }),
+      { correct: 0, questions: 0 }
+    );
+
+    if (totals.questions === 0) return 0;
+    return (totals.correct / totals.questions) * 100;
+  }, [results]);
+
+  const recentProgress = useMemo(() => {
+    return results
+      .slice(0, 8)
+      .reverse()
+      .map((item) => ({
+        ...item,
+        normalizedScore:
+          item.maxScore > 0
+            ? Math.min(10, (item.score / item.maxScore) * 10)
+            : 0,
+      }));
   }, [results]);
 
   const initials = useMemo(() => {
@@ -534,34 +626,126 @@ export default function TaiKhoanPage() {
           </aside>
 
           <section className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <article className="rounded-2xl bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">
-                  Lớp học
-                </p>
-                <p className="mt-2 text-3xl font-extrabold text-blue-700">
-                  {classes.length}
-                </p>
-              </article>
+            {role === "student" ? (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <article className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-sm text-slate-500">Lớp đã tham gia</p>
+                    <p className="mt-2 text-3xl font-extrabold text-blue-700">
+                      {classes.length}
+                    </p>
+                  </article>
 
-              <article className="rounded-2xl bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">
-                  Lượt làm bài
-                </p>
-                <p className="mt-2 text-3xl font-extrabold text-emerald-700">
-                  {results.length}
-                </p>
-              </article>
+                  <article className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-sm text-slate-500">Bài đã làm</p>
+                    <p className="mt-2 text-3xl font-extrabold text-emerald-700">
+                      {results.length}
+                    </p>
+                  </article>
 
-              <article className="rounded-2xl bg-white p-5 shadow-sm">
-                <p className="text-sm text-slate-500">
-                  Điểm trung bình
-                </p>
-                <p className="mt-2 text-3xl font-extrabold text-violet-700">
-                  {averageScore.toFixed(1)}
-                </p>
-              </article>
-            </div>
+                  <article className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-sm text-slate-500">Điểm trung bình</p>
+                    <p className="mt-2 text-3xl font-extrabold text-violet-700">
+                      {normalizedAverageScore.toFixed(1)}
+                      <span className="ml-1 text-base text-slate-400">/10</span>
+                    </p>
+                  </article>
+
+                  <article className="rounded-2xl bg-white p-5 shadow-sm">
+                    <p className="text-sm text-slate-500">Điểm cao nhất</p>
+                    <p className="mt-2 text-3xl font-extrabold text-amber-600">
+                      {highestScore.toFixed(1)}
+                      <span className="ml-1 text-base text-slate-400">/10</span>
+                    </p>
+                  </article>
+                </div>
+
+                <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <div>
+                      <p className="text-sm font-extrabold uppercase tracking-wider text-blue-600">
+                        Thống kê cá nhân
+                      </p>
+                      <h2 className="mt-1 text-2xl font-extrabold">
+                        Tiến độ học tập
+                      </h2>
+                    </div>
+
+                    <div className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700">
+                      Tỷ lệ đúng {correctRate.toFixed(0)}%
+                    </div>
+                  </div>
+
+                  {recentProgress.length === 0 ? (
+                    <div className="mt-6 rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
+                      Làm bài để bắt đầu theo dõi tiến độ.
+                    </div>
+                  ) : (
+                    <div className="mt-6">
+                      <div className="flex h-52 items-end gap-3 overflow-x-auto rounded-2xl bg-slate-50 p-4">
+                        {recentProgress.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex min-w-16 flex-1 flex-col items-center justify-end"
+                            title={`${item.examTitle}: ${item.normalizedScore.toFixed(1)}/10`}
+                          >
+                            <span className="mb-2 text-xs font-extrabold text-slate-700">
+                              {item.normalizedScore.toFixed(1)}
+                            </span>
+                            <div
+                              className="w-full max-w-12 rounded-t-xl bg-gradient-to-t from-blue-600 to-cyan-400"
+                              style={{
+                                height: `${Math.max(
+                                  8,
+                                  item.normalizedScore * 13
+                                )}px`,
+                              }}
+                            />
+                            <p className="mt-2 w-16 truncate text-center text-[10px] font-semibold text-slate-500">
+                              {item.examTitle}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <p className="mt-3 text-xs text-slate-500">
+                        Biểu đồ hiển thị tối đa 8 bài gần nhất, quy đổi về thang điểm 10.
+                      </p>
+                    </div>
+                  )}
+                </section>
+              </>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <article className="rounded-2xl bg-white p-5 shadow-sm">
+                  <p className="text-sm text-slate-500">Lớp đang quản lý</p>
+                  <p className="mt-2 text-3xl font-extrabold text-blue-700">
+                    {classes.length}
+                  </p>
+                </article>
+
+                <article className="rounded-2xl bg-white p-5 shadow-sm">
+                  <p className="text-sm text-slate-500">Đề đã tạo</p>
+                  <p className="mt-2 text-3xl font-extrabold text-violet-700">
+                    {teacherStats.examCount}
+                  </p>
+                </article>
+
+                <article className="rounded-2xl bg-white p-5 shadow-sm">
+                  <p className="text-sm text-slate-500">Đề công khai</p>
+                  <p className="mt-2 text-3xl font-extrabold text-emerald-700">
+                    {teacherStats.publishedExamCount}
+                  </p>
+                </article>
+
+                <article className="rounded-2xl bg-white p-5 shadow-sm">
+                  <p className="text-sm text-slate-500">Lượt người học làm bài</p>
+                  <p className="mt-2 text-3xl font-extrabold text-amber-600">
+                    {teacherStats.attemptCount}
+                  </p>
+                </article>
+              </div>
+            )}
 
             <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex items-center justify-between gap-4">
@@ -661,7 +845,7 @@ export default function TaiKhoanPage() {
                   </div>
                 ) : (
                   <div className="mt-6 space-y-3">
-                    {results.map((item) => (
+                    {results.slice(0, 10).map((item) => (
                       <article
                         key={item.id}
                         className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center"
@@ -722,7 +906,7 @@ export default function TaiKhoanPage() {
                     Ngân hàng câu hỏi
                   </h2>
                   <p className="mt-2 text-slate-300">
-                    Quản lý và sử dụng câu hỏi cho nhiều đề.
+                    Quản lý và tái sử dụng câu hỏi cho nhiều đề.
                   </p>
                 </Link>
               </section>
