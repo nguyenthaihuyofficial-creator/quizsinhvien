@@ -280,7 +280,21 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/thuong-hieu"
+              className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-700"
+            >
+              Cài đặt thương hiệu
+            </Link>
+
+            <Link
+              href="/gioi-thieu"
+              className="rounded-xl border border-violet-300 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 hover:bg-violet-100"
+            >
+              Trang giới thiệu
+            </Link>
+
             <Link
               href="/"
               className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"

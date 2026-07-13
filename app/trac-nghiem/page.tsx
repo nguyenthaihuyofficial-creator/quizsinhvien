@@ -61,6 +61,20 @@ interface DatabaseExam {
   questions: DatabaseQuestion[];
 }
 
+interface QuestionBankAnswerRow {
+  answer_label: string;
+  answer_text: string;
+  is_correct: boolean;
+}
+
+interface QuestionBankRow {
+  id: string;
+  question_text: string;
+  question_bank_answers:
+    | QuestionBankAnswerRow[]
+    | null;
+}
+
 function validateQuestion(question: Question): string[] {
   const issues: string[] = [];
 
@@ -221,6 +235,8 @@ export default function TracNghiemPage() {
 
       if (editingExamId) {
         await loadExamForEditing(editingExamId);
+      } else {
+        await loadQuestionsFromBank();
       }
     } catch (error) {
       setMessage(
@@ -232,6 +248,103 @@ export default function TracNghiemPage() {
     } finally {
       setPageLoading(false);
     }
+  }
+
+  async function loadQuestionsFromBank() {
+    const rawIds = localStorage.getItem(
+      "selectedQuestionBankIds"
+    );
+
+    if (!rawIds) return;
+
+    let selectedIds: string[] = [];
+
+    try {
+      const parsed = JSON.parse(rawIds);
+
+      if (Array.isArray(parsed)) {
+        selectedIds = parsed.filter(
+          (item): item is string =>
+            typeof item === "string" && item.length > 0
+        );
+      }
+    } catch {
+      localStorage.removeItem("selectedQuestionBankIds");
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      localStorage.removeItem("selectedQuestionBankIds");
+      return;
+    }
+
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("question_bank")
+      .select(
+        `
+        id,
+        question_text,
+        question_bank_answers (
+          answer_label,
+          answer_text,
+          is_correct
+        )
+        `
+      )
+      .in("id", selectedIds);
+
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as QuestionBankRow[];
+    const rowMap = new Map(
+      rows.map((row) => [row.id, row])
+    );
+
+    const importedQuestions = selectedIds
+      .map((id) => rowMap.get(id))
+      .filter(
+        (row): row is QuestionBankRow => Boolean(row)
+      )
+      .map((row) =>
+        refreshQuestion({
+          content: row.question_text,
+          score: 1,
+          answers: [
+            ...(row.question_bank_answers || []),
+          ]
+            .sort((a, b) =>
+              a.answer_label.localeCompare(
+                b.answer_label
+              )
+            )
+            .map((answer) => ({
+              content: answer.answer_text,
+              isCorrect: answer.is_correct,
+            })),
+        })
+      );
+
+    localStorage.removeItem("selectedQuestionBankIds");
+
+    if (importedQuestions.length === 0) {
+      setMessage(
+        "Không tải được câu hỏi đã chọn từ ngân hàng."
+      );
+      setMessageType("error");
+      return;
+    }
+
+    setQuestions(importedQuestions);
+    setExamTitle("Đề tạo từ ngân hàng câu hỏi");
+    setQuestionLimit(0);
+    setMessage(
+      `Đã đưa ${importedQuestions.length} câu từ ngân hàng vào đề.`
+    );
+    setMessageType("success");
   }
 
   async function loadExamForEditing(examId: string) {
@@ -1314,6 +1427,13 @@ export default function TracNghiemPage() {
                 : "Tải file lên"}
             </button>
 
+            <Link
+              href="/ngan-hang-cau-hoi"
+              className="rounded-xl bg-cyan-600 px-5 py-3 text-sm font-bold text-white hover:bg-cyan-700"
+            >
+              Chọn từ ngân hàng
+            </Link>
+
             <button
               type="button"
               onClick={addQuestion}
@@ -1645,8 +1765,8 @@ export default function TracNghiemPage() {
             </h2>
 
             <p className="mx-auto mt-2 max-w-lg leading-7 text-slate-600">
-              Tải file lên hoặc bấm “Thêm câu thủ công”
-              để bắt đầu tạo đề.
+              Tải file, chọn câu từ ngân hàng hoặc bấm
+              “Thêm câu thủ công” để bắt đầu tạo đề.
             </p>
           </section>
         )}
